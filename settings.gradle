@@ -1,0 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'micro-sicmas'
+include ':transporte'
+project(':transporte').projectDir = new File('../transporte')
+
+
