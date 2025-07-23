@@ -4,6 +4,7 @@ import com.mx.microsicmas.domain.*;
 import com.mx.microsicmas.model.request.PlanningRequest;
 import com.mx.microsicmas.model.response.PlanningResponse;
 import com.mx.microsicmas.model.response.PlanningResponseOut;
+import com.mx.microsicmas.model.response.RecommendationDTO;
 import com.mx.microsicmas.repository.*;
 import com.mx.microsicmas.service.PlanningService;
 import org.springframework.beans.BeanUtils;
@@ -14,8 +15,10 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +33,8 @@ public class PlanningServiceImpl implements PlanningService {
     private AuditoryEntityRepository auditoryEntityRepository;
     @Autowired
     private StatusRepository statusRepository;
-
+    @Autowired
+    private PlanningRecommendationRepository recommendationRepository;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     @Override
@@ -89,17 +93,44 @@ public class PlanningServiceImpl implements PlanningService {
     }
     public List<PlanningResponseOut> listarPlanningsActivos() {
         List<Planning> plannings = planningRepository.findAllActiveWithDetails();
+        List<PlanningRecommendation> allRecs = recommendationRepository.findAllByPlanningInAndActiveTrue(plannings);
+        Map<Long, List<RecommendationDTO>> recsByPlanningId = allRecs.stream()
+                .collect(Collectors.groupingBy(
+                        rec -> rec.getPlanning().getId(),
+                        Collectors.mapping(rec -> {
+                            RecommendationDTO dto = new RecommendationDTO();
+                            dto.setId(rec.getId());
+                            dto.setName(rec.getName());
+                            dto.setRecommendation(rec.getRecommendation());
+                            return dto;
+                        }, Collectors.toList())
+                ));
 
         return plannings.stream()
-                .map(this::mapToResponse)
+                .map(p -> {
+                    List<RecommendationDTO> recs = recsByPlanningId.getOrDefault(p.getId(), new ArrayList<>());
+                    return mapToResponse(p, recs);
+                })
                 .collect(Collectors.toList());
+
+
     }
 
     @Override
     public PlanningResponseOut getPlanningById(Long id) {
         Planning planning = planningRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new EntityNotFoundException("Planning no encontrado con id: " + id));
-        return mapToResponse(planning);
+        List<RecommendationDTO> recommendationDTOs = planning.getRecommendations().stream()
+                .map(rec -> {
+                    RecommendationDTO dto = new RecommendationDTO();
+                    dto.setId(rec.getId());
+                    dto.setName(rec.getName());
+                    dto.setRecommendation(rec.getRecommendation());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return mapToResponse(planning,recommendationDTOs);
     }
 
     private String formatDate(Date date) {
@@ -107,7 +138,7 @@ public class PlanningServiceImpl implements PlanningService {
                 ? date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                 : null;
     }
-    public PlanningResponseOut mapToResponse(Planning p) {
+    public PlanningResponseOut mapToResponse(Planning p,List<RecommendationDTO> listRecommen) {
         PlanningResponseOut response = new PlanningResponseOut();
 
         response.setId(p.getId());
@@ -151,6 +182,7 @@ public class PlanningServiceImpl implements PlanningService {
         response.setApprovalStatusId(p.getApprovalStatus() != null ? p.getApprovalStatus().getId() : null);
         response.setApprovalStatusName(p.getApprovalStatus() != null ? p.getApprovalStatus().getName() : null);
 
+        response.setRecommendations(listRecommen);
         return response;
     }
 }

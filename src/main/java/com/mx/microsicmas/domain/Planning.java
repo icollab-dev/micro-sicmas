@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "TX_SIC_PLANNING")
@@ -54,4 +56,6 @@ public class Planning extends BaseEntity {
     private Date startDateAuditory;
     @Column(name = "END_DATE_AUDITORY")
     private Date endDateAuditory;
+    @OneToMany(mappedBy = "planning", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlanningRecommendation> recommendations = new ArrayList<>();
 }

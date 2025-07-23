@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PlanningRepository extends JpaRepository<Planning, Integer> {
+public interface PlanningRepository extends JpaRepository<Planning, Long> {
     @Query("SELECT p FROM Planning p " +
             "LEFT JOIN FETCH p.rule " +
             "LEFT JOIN FETCH p.classification " +

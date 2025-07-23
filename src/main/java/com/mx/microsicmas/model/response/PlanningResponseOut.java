@@ -2,6 +2,8 @@ package com.mx.microsicmas.model.response;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class PlanningResponseOut {
     private Long id;
@@ -30,4 +32,6 @@ public class PlanningResponseOut {
     private String auditoryEntityName;
     private String auditoryStatusName;
     private String approvalStatusName;
+
+    private List<RecommendationDTO> recommendations;
 }

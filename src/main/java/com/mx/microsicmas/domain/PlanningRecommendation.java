@@ -17,8 +17,9 @@ public class PlanningRecommendation extends BaseEntity{
     @SequenceGenerator(name = "id_Sequence_TX_SIC_PLANNING_RECOMMENDATION", sequenceName = "TX_SIC_PLANNING_RECOMMENDATION_id_seq", allocationSize = 1)
     @Column(name = "ID")
     private long id;
-    @Column(name = "PLANNING_ID")
-    private long planningId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PLANNING_ID", nullable = false)
+    private Planning planning;
     @Column(name = "RECOMMENDATION")
     private String recommendation;
     @Column(name = "NAME")
