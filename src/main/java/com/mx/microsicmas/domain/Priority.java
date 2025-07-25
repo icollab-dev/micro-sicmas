@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "CAT_SIC_PRIORITY")
@@ -19,4 +21,6 @@ public class Priority extends BaseEntity{
     private long id;
     @Column(name = "NAME")
     private String name;
+    @OneToMany(mappedBy = "priority")
+    private List<Finding> findings = new ArrayList<>();
 }

@@ -133,11 +133,6 @@ public class PlanningServiceImpl implements PlanningService {
         return mapToResponse(planning,recommendationDTOs);
     }
 
-    private String formatDate(Date date) {
-        return date != null
-                ? date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
-                : null;
-    }
     public PlanningResponseOut mapToResponse(Planning p,List<RecommendationDTO> listRecommen) {
         PlanningResponseOut response = new PlanningResponseOut();
 

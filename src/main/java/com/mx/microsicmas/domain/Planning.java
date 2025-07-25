@@ -58,4 +58,6 @@ public class Planning extends BaseEntity {
     private Date endDateAuditory;
     @OneToMany(mappedBy = "planning", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlanningRecommendation> recommendations = new ArrayList<>();
+    @OneToMany(mappedBy = "planning", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Finding> findings = new ArrayList<>();
 }
