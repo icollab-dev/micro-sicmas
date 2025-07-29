@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SupportPlanning {
+public class SupportPlanning extends BaseEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "id_Sequence_TX_SIC_PLANNING_SUPPORT")
     @SequenceGenerator(name = "id_Sequence_TX_SIC_PLANNING_SUPPORT", sequenceName = "TX_SIC_PLANNING_SUPPORT_id_seq", allocationSize = 1)

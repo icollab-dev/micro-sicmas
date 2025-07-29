@@ -2,6 +2,7 @@ package com.mx.microsicmas.service.impl;
 
 import com.mx.microsicmas.domain.*;
 import com.mx.microsicmas.model.request.PlanningRequest;
+import com.mx.microsicmas.model.response.FindingResponseOut;
 import com.mx.microsicmas.model.response.PlanningResponse;
 import com.mx.microsicmas.model.response.PlanningResponseOut;
 import com.mx.microsicmas.model.response.RecommendationDTO;
@@ -15,10 +16,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +33,8 @@ public class PlanningServiceImpl implements PlanningService {
     private StatusRepository statusRepository;
     @Autowired
     private PlanningRecommendationRepository recommendationRepository;
+    @Autowired
+    private  FindingRepository findingRepository;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     @Override
@@ -109,7 +109,7 @@ public class PlanningServiceImpl implements PlanningService {
         return plannings.stream()
                 .map(p -> {
                     List<RecommendationDTO> recs = recsByPlanningId.getOrDefault(p.getId(), new ArrayList<>());
-                    return mapToResponse(p, recs);
+                    return mapToResponse(p, recs, Arrays.asList());
                 })
                 .collect(Collectors.toList());
 
@@ -120,6 +120,10 @@ public class PlanningServiceImpl implements PlanningService {
     public PlanningResponseOut getPlanningById(Long id) {
         Planning planning = planningRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new EntityNotFoundException("Planning no encontrado con id: " + id));
+        List<Finding> findings = findingRepository.findAllByPlanningIdAndActiveTrue(id);
+        List<FindingResponseOut> findingResponses = findings.stream()
+                .map(this::mapToResponseFinding)
+                .collect(Collectors.toList());
         List<RecommendationDTO> recommendationDTOs = planning.getRecommendations().stream()
                 .map(rec -> {
                     RecommendationDTO dto = new RecommendationDTO();
@@ -130,10 +134,10 @@ public class PlanningServiceImpl implements PlanningService {
                 })
                 .collect(Collectors.toList());
 
-        return mapToResponse(planning,recommendationDTOs);
+        return mapToResponse(planning,recommendationDTOs,findingResponses);
     }
 
-    public PlanningResponseOut mapToResponse(Planning p,List<RecommendationDTO> listRecommen) {
+    public PlanningResponseOut mapToResponse(Planning p,List<RecommendationDTO> listRecommen,List<FindingResponseOut> findingResponses) {
         PlanningResponseOut response = new PlanningResponseOut();
 
         response.setId(p.getId());
@@ -176,8 +180,33 @@ public class PlanningServiceImpl implements PlanningService {
 
         response.setApprovalStatusId(p.getApprovalStatus() != null ? p.getApprovalStatus().getId() : null);
         response.setApprovalStatusName(p.getApprovalStatus() != null ? p.getApprovalStatus().getName() : null);
-
+        
+        response.setFindings(findingResponses);
         response.setRecommendations(listRecommen);
+
+        return response;
+    }
+    private FindingResponseOut mapToResponseFinding(Finding finding) {
+
+        FindingResponseOut response = new FindingResponseOut();
+        response.setId(finding.getId());
+        response.setNumFinding(finding.getNumFinding());
+        response.setPlanningId(finding.getPlanning().getId());
+        response.setFindingDate(finding.getDate().toString());
+        response.setEndDate(finding.getEndDate().toString());
+        if(finding.getPriority() !=null){
+            response.setPriorityId(finding.getPriority().getId());
+            response.setPriorityName(finding.getPriority().getName());
+        }
+        if(finding.getClassification() !=null){
+            response.setClasificationId(finding.getClassification().getId());
+            response.setClassificationName(finding.getClassification().getName());
+        }
+        response.setStatusEvent(finding.getStatusEvent());
+        response.setStatusApproval(finding.getStatusApproval());
+        response.setName(finding.getName());
+        response.setDescription(finding.getDescription());
+        response.setPointRule(finding.getPointRule());
         return response;
     }
 }

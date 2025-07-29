@@ -1,9 +1,15 @@
 package com.mx.microsicmas.controller;
 
+import com.mx.microsicmas.domain.Finding;
+import com.mx.microsicmas.domain.FindingStaff;
+import com.mx.microsicmas.domain.Staff;
 import com.mx.microsicmas.model.request.FindingRequest;
+import com.mx.microsicmas.model.request.StaffFindingRequest;
 import com.mx.microsicmas.model.response.FindingResponse;
 import com.mx.microsicmas.model.response.FindingResponseOut;
+import com.mx.microsicmas.model.response.StaffFindingResponse;
 import com.mx.microsicmas.service.FindingService;
+import com.mx.microsicmas.service.FindingStaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +24,8 @@ import java.util.List;
 public class FindingController {
     @Autowired
     private FindingService findingService;
+    @Autowired
+    private FindingStaffService findingStaffService;
 
     @PostMapping("/new")
     public ResponseEntity<FindingResponse> newFinding(@RequestBody @Validated FindingRequest finding) {
@@ -30,6 +38,14 @@ public class FindingController {
     @GetMapping("/list/{id}")
     public ResponseEntity<FindingResponseOut> listFinding(@PathVariable Long id) {
         return ResponseEntity.ok(findingService.findById(id));
+    }
+    @PostMapping("/staff/add")
+    public ResponseEntity<StaffFindingResponse> addStaff(@RequestBody @Validated StaffFindingRequest staff) {
+        return ResponseEntity.ok(findingStaffService.addStaffToFinding(staff));
+    }
+    @GetMapping("/list/staff/{id}")
+    public ResponseEntity<List<StaffFindingResponse>> listFindingStaff(@PathVariable Long id) {
+        return  ResponseEntity.ok(findingStaffService.getStaffByFindingId(id));
     }
 
 }

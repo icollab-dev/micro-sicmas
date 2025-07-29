@@ -34,4 +34,5 @@ public class PlanningResponseOut {
     private String approvalStatusName;
 
     private List<RecommendationDTO> recommendations;
+    private List<FindingResponseOut> findings;
 }
