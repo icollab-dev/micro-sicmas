@@ -60,4 +60,6 @@ public class Planning extends BaseEntity {
     private List<PlanningRecommendation> recommendations = new ArrayList<>();
     @OneToMany(mappedBy = "planning", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Finding> findings = new ArrayList<>();
+    @OneToMany(mappedBy = "planning", fetch = FetchType.LAZY)
+    private List<SupportPlanning> supports;
 }

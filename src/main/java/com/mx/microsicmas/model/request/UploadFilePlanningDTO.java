@@ -1,13 +1,11 @@
-package com.mx.microsicmas.payload;
+package com.mx.microsicmas.model.request;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Getter
 @Setter
-public class UploadFileResponse {
+public class UploadFilePlanningDTO {
     private Long fileId;
     private Long planningId;
     private String fileName;
@@ -16,5 +14,5 @@ public class UploadFileResponse {
     private Long fileSize;
     private byte[] fileData;
     private String fileDownloadUri;
-    private Date dateCreated;
+    private boolean rca;
 }

@@ -18,9 +18,9 @@ public class SupportPlanning extends BaseEntity {
     @Column(name = "ID")
     private long id;
 
-    @Basic(optional = false)
-    @Column(name = "PLANNING_ID")
-    private long planningId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PLANNING_ID", nullable = false)
+    private Planning planning;
 
     @Basic(optional = false)
     @Column(name = "FILE_NAME")
