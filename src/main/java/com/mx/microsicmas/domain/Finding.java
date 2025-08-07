@@ -59,5 +59,7 @@ public class Finding extends BaseEntity {
     private String statusApproval;
     @Column(name = "STATUS_EVENT")
     private String statusEvent;
-
+    @ManyToOne
+    @JoinColumn(name = "RESOURCE_REQUEST_ID")
+    private ResourceRequest resourceRequest;
 }
