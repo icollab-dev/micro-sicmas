@@ -43,9 +43,13 @@ public class FindingServiceImpl implements FindingService {
     public FindingResponse save(FindingRequest findingRequest) {
         Finding finding = new Finding();
         BeanUtils.copyProperties(findingRequest, finding);
-        Planning planning = planningRepository.findById(findingRequest.getPlanningId())
-                .orElseThrow(()->new RuntimeException("No se encotró el planning"));
-        finding.setPlanning(planning);
+        if(finding.getPlanning() != null) {
+            Planning planning = planningRepository.findById(findingRequest.getPlanningId())
+                    .orElseThrow(()->new RuntimeException("No se encotró el planning"));
+            finding.setPlanning(planning);
+        }else {
+            finding.setPlanning(null);
+        }
         Priority priority = priorityRepository.findById(findingRequest.getPriorityId())
                 .orElseThrow(()->new RuntimeException("No se encontró el priority"));
         finding.setPriority(priority);

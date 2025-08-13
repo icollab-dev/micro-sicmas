@@ -5,7 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "TX_SIC_FINDING")
@@ -21,7 +23,7 @@ public class Finding extends BaseEntity {
     @Column(name = "NUM_FINDING")
     private String numFinding;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_PLANNING")  // <-- nombre real de la columna en BD
+    @JoinColumn(name = "ID_PLANNING", nullable = true)
     private Planning planning;
     @Column(name = "FINDING_DATE")
     private Date date;
@@ -62,4 +64,6 @@ public class Finding extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "RESOURCE_REQUEST_ID")
     private ResourceRequest resourceRequest;
+    @OneToMany(mappedBy = "finding", fetch = FetchType.LAZY)
+    private List<FindingAction> actions = new ArrayList<>();
 }

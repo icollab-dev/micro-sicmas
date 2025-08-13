@@ -14,7 +14,6 @@ import javax.validation.constraints.NotNull;
 public class FindingRequest {
     @NotBlank
     private String numFinding;
-    @NotNull
     private Long planningId;
     @NotBlank
     private String findingDate;

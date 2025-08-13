@@ -1,13 +1,17 @@
 package com.mx.microsicmas.controller;
 
 import com.mx.microsicmas.domain.Finding;
+import com.mx.microsicmas.domain.FindingAction;
 import com.mx.microsicmas.domain.FindingStaff;
 import com.mx.microsicmas.domain.Staff;
+import com.mx.microsicmas.model.request.FindingActionRequest;
 import com.mx.microsicmas.model.request.FindingRequest;
 import com.mx.microsicmas.model.request.StaffFindingRequest;
+import com.mx.microsicmas.model.response.FindingActionResoponse;
 import com.mx.microsicmas.model.response.FindingResponse;
 import com.mx.microsicmas.model.response.FindingResponseOut;
 import com.mx.microsicmas.model.response.StaffFindingResponse;
+import com.mx.microsicmas.service.FindigActionService;
 import com.mx.microsicmas.service.FindingService;
 import com.mx.microsicmas.service.FindingStaffService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,8 @@ public class FindingController {
     private FindingService findingService;
     @Autowired
     private FindingStaffService findingStaffService;
+    @Autowired
+    private FindigActionService findigActionService;
 
     @PostMapping("/new")
     public ResponseEntity<FindingResponse> newFinding(@RequestBody @Validated FindingRequest finding) {
@@ -47,5 +53,13 @@ public class FindingController {
     public ResponseEntity<List<StaffFindingResponse>> listFindingStaff(@PathVariable Long id) {
         return  ResponseEntity.ok(findingStaffService.getStaffByFindingId(id));
     }
-
+    
+    @PostMapping("/action/new")
+    public ResponseEntity<FindingActionResoponse> save(@RequestBody @Validated FindingActionRequest request){
+        return ResponseEntity.ok(findigActionService.save(request));
+    }
+    @GetMapping("/action/list/{id}")
+    public ResponseEntity<List<FindingActionResoponse>> listFindingAction(@PathVariable Long id){
+        return ResponseEntity.ok(findigActionService.listByFinding(id));
+    }
 }
