@@ -2,6 +2,7 @@ package com.mx.microsicmas.service.impl;
 
 import com.mx.microsicmas.domain.*;
 import com.mx.microsicmas.model.request.PlanningRequest;
+import com.mx.microsicmas.model.request.PlanningRequestUpdate;
 import com.mx.microsicmas.model.response.FindingResponseOut;
 import com.mx.microsicmas.model.response.PlanningResponse;
 import com.mx.microsicmas.model.response.PlanningResponseOut;
@@ -185,6 +186,90 @@ public class PlanningServiceImpl implements PlanningService {
         response.setRecommendations(listRecommen);
 
         return response;
+    }
+
+    public PlanningResponse actualizaPlanning(PlanningRequestUpdate planningRequestUpdate){
+        Planning planingDb= planningRepository.findById(planningRequestUpdate.getId())
+                .orElseThrow(()-> new EntityNotFoundException("Planning no encontrado con id: " + planningRequestUpdate.getId()));
+        //atribitos a actualziar
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if (planningRequestUpdate.getStartDate() != null) {
+            planingDb.setStartDate(java.sql.Date.valueOf(LocalDate.parse(planningRequestUpdate.getStartDate(), formatter)));
+        }
+        if (planningRequestUpdate.getEndDate() != null) {
+            planingDb.setEndDate(java.sql.Date.valueOf(LocalDate.parse(planningRequestUpdate.getEndDate(), formatter)));
+        }
+        if (planningRequestUpdate.getStartDateAuditory() != null) {
+            planingDb.setStartDateAuditory(java.sql.Date.valueOf(LocalDate.parse(planningRequestUpdate.getStartDateAuditory(), formatter)));
+        }
+        if (planningRequestUpdate.getEndDateAuditory() != null) {
+            planingDb.setEndDateAuditory(java.sql.Date.valueOf(LocalDate.parse(planningRequestUpdate.getEndDateAuditory(), formatter)));
+        }
+        Rule rule = ruleRepository.findById(planningRequestUpdate.getRuleId())
+                .orElseThrow(() -> new RuntimeException("Rule no encontrada"));
+
+        planingDb.setRule(rule);
+        ClassificationAudit classification = classificationAuditRepository.findById(planningRequestUpdate.getClasificationId())
+                .orElseThrow(() -> new RuntimeException("ClassificationAudit no encontrada"));
+        planingDb.setClassification(classification);
+
+        AuditoryEntity auditoryEntity = auditoryEntityRepository.findById(planningRequestUpdate.getAuditoryEntityId())
+                .orElseThrow(() -> new RuntimeException("AuditoryEntity no encontrada"));
+        planingDb.setAuditoryEntity(auditoryEntity);
+        Status statusAuditory = statusRepository.findById(planningRequestUpdate.getAuditoryStatusId())
+                .orElseThrow(() -> new RuntimeException("StatusAudit no encontrada"));
+        planingDb.setAuditoryStatus(statusAuditory);
+        Status statusApproval = statusRepository.findById(planningRequestUpdate.getStatusApprovalId())
+                .orElseThrow(() -> new RuntimeException("StatusApproval no encontrada"));
+        planingDb.setApprovalStatus(statusApproval);
+        if(planningRequestUpdate.getVersion()!=null){
+            planingDb.setVersion(planningRequestUpdate.getVersion());
+        }
+        if(planningRequestUpdate.getObjetive()!=null){
+            planingDb.setObjetive(planningRequestUpdate.getObjetive());
+        }
+        if(planningRequestUpdate.getScope()!=null){
+            planingDb.setScope(planningRequestUpdate.getScope());
+        }
+        if(planningRequestUpdate.getAuditorName()!=null){
+            planingDb.setAuditorName(planningRequestUpdate.getAuditorName());
+        }
+        if(planningRequestUpdate.getSummary()!=null){
+            planingDb.setSummary(planningRequestUpdate.getSummary());
+        }
+        if(planningRequestUpdate.getNumber()!=null){
+            planingDb.setNumber(planningRequestUpdate.getNumber());
+        }
+        // termina atributos a actualizar
+        Planning planingUpdated = planningRepository.save(planingDb);
+        PlanningResponse planningResponse= new PlanningResponse();
+        planningResponse.setStartDate(planingUpdated.getStartDate() != null
+                ? formatter.format(((java.sql.Date) planingUpdated.getStartDate()).toLocalDate())
+                : null);
+        planningResponse.setEndDate(planingUpdated.getEndDate() != null
+                ? formatter.format(((java.sql.Date) planingUpdated.getEndDate()).toLocalDate())
+                : null);
+        planningResponse.setStartDateAuditory(planingUpdated.getStartDateAuditory() != null
+                ? formatter.format(((java.sql.Date) planingUpdated.getStartDateAuditory()).toLocalDate())
+                : null);
+        planningResponse.setEndDateAuditory(planingUpdated.getEndDateAuditory() != null
+                ? formatter.format(((java.sql.Date) planingUpdated.getEndDateAuditory()).toLocalDate())
+                : null);
+        planningResponse.setRuleId(planingUpdated.getRule().getId());
+        planningResponse.setAuditoryEntityId(planingUpdated.getAuditoryEntity().getId());
+        planningResponse.setAuditoryStatusId(planingUpdated.getAuditoryStatus().getId());
+        planningResponse.setStatusApprovalId(planingUpdated.getApprovalStatus().getId());
+        planningResponse.setClasificationId(planingUpdated.getClassification().getId());
+        BeanUtils.copyProperties(planingUpdated, planningResponse, "startDate", "endDate", "startDateAuditory", "endDateAuditory");
+        return planningResponse;
+
+    }
+    public Boolean eliminaPlanning(Long id) {
+        Planning planning = planningRepository.findById(id).orElseThrow(() -> new RuntimeException("Planning no encontrada"));
+        planning.setActive(false);
+        planningRepository.save(planning);
+        return true;
     }
     private FindingResponseOut mapToResponseFinding(Finding finding) {
 

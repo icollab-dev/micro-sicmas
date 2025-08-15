@@ -1,6 +1,7 @@
 package com.mx.microsicmas.controller;
 
 import com.mx.microsicmas.model.request.PlanningRequest;
+import com.mx.microsicmas.model.request.PlanningRequestUpdate;
 import com.mx.microsicmas.model.response.PlanningResponse;
 import com.mx.microsicmas.model.response.PlanningResponseOut;
 import com.mx.microsicmas.service.PlanningService;
@@ -30,5 +31,14 @@ public class PlanningController {
     @GetMapping("/list/{id}")
     public ResponseEntity<PlanningResponseOut> getPlanning(@PathVariable Long id) {
         return ResponseEntity.ok(planningService.getPlanningById(id));
+    }
+    @PutMapping()
+    public ResponseEntity<PlanningResponse> actualizarPlanning(@Validated @RequestBody PlanningRequestUpdate planningRequestUpdate) {
+        return ResponseEntity.ok(planningService.actualizaPlanning(planningRequestUpdate));
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> eliminarPlanning(@PathVariable Long id) {
+
+        return ResponseEntity.ok(planningService.eliminaPlanning(id));
     }
 }

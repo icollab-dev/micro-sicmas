@@ -107,7 +107,9 @@ public class FindingServiceImpl implements FindingService {
         FindingResponseOut response = new FindingResponseOut();
         response.setId(finding.getId());
         response.setNumFinding(finding.getNumFinding());
-        response.setPlanningId(finding.getPlanning().getId());
+        if(finding.getPlanning() != null) {
+            response.setPlanningId(finding.getPlanning().getId());
+        }
         response.setFindingDate(finding.getDate().toString());
         response.setEndDate(finding.getEndDate().toString());
         if(finding.getPriority() !=null){
