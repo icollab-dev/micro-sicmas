@@ -57,10 +57,12 @@ public class Finding extends BaseEntity {
     private String userReject;
     @Column(name = "DATE_REJECTED")
     private Date dateRejected;
-    @Column(name = "STATUS_APPROVAL")
-    private String statusApproval;
-    @Column(name = "STATUS_EVENT")
-    private String statusEvent;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "STATUS_APPROVAL")
+    private Status statusApproval;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "STATUS_EVENT")
+    private Status statusEvent;
     @ManyToOne
     @JoinColumn(name = "RESOURCE_REQUEST_ID")
     private ResourceRequest resourceRequest;

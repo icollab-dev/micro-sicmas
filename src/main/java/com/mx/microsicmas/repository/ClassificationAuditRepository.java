@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public interface ClassificationAuditRepository extends JpaRepository<ClassificationAudit, Long> {
-    List<ClassificationAudit> findClassificationAuditsByActiveTrue();
+    List<ClassificationAudit> findClassificationAuditsByActiveTrueAndAuditoryTrue();
+    List<ClassificationAudit> findClassificationAuditsByActiveTrueAndFindTrue();
 }

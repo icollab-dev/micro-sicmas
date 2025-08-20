@@ -287,8 +287,8 @@ public class PlanningServiceImpl implements PlanningService {
             response.setClasificationId(finding.getClassification().getId());
             response.setClassificationName(finding.getClassification().getName());
         }
-        response.setStatusEvent(finding.getStatusEvent());
-        response.setStatusApproval(finding.getStatusApproval());
+        response.setStatusEvent(finding.getStatusEvent().getId());
+        response.setStatusApproval(finding.getStatusApproval().getId());
         response.setName(finding.getName());
         response.setDescription(finding.getDescription());
         response.setPointRule(finding.getPointRule());

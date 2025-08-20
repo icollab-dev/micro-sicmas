@@ -17,5 +17,7 @@ public interface FindingRepository extends JpaRepository<Finding, Long> {
     List<Finding> findAllByPlanningIdAndActiveTrue(Long planningId);
     @Query("SELECT f FROM Finding f WHERE f.id IN :ids AND f.active = true AND f.resourceRequest IS NULL")
     List<Finding> findAvailableAndActiveFindingsByIdIn(@Param("ids") List<Long> ids);
+    @Query("SELECT MAX(f.id) FROM Finding f")
+    Long getLastConsecutivo();
     //List<Finding> findAllActiveWithDetails();
 }

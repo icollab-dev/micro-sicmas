@@ -9,6 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 public class FindingResponse {
+    private Long id;
     private String numFinding;
     private Long planningId;
     private String findingDate;
@@ -18,4 +19,6 @@ public class FindingResponse {
     private String endDate;
     private Long priorityId;
     private Long clasificationId;
+    private Long statusApproval;
+    private Long statusEvent;
 }

@@ -19,8 +19,8 @@ public class FindingResponseOut {
     private String endDate;
     private Long priorityId;
     private Long clasificationId;
-    private String statusApproval;
-    private String statusEvent;
+    private Long statusApproval;
+    private Long statusEvent;
     private String priorityName;
     private String classificationName;
 

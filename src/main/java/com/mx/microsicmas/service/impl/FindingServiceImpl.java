@@ -1,17 +1,12 @@
 package com.mx.microsicmas.service.impl;
 
-import com.mx.microsicmas.domain.ClassificationAudit;
-import com.mx.microsicmas.domain.Finding;
-import com.mx.microsicmas.domain.Planning;
-import com.mx.microsicmas.domain.Priority;
+import com.mx.microsicmas.domain.*;
 import com.mx.microsicmas.model.request.FindingRequest;
+import com.mx.microsicmas.model.request.FindingUpdateRequest;
 import com.mx.microsicmas.model.response.FindingResponse;
 import com.mx.microsicmas.model.response.FindingResponseOut;
 import com.mx.microsicmas.model.response.RecommendationDTO;
-import com.mx.microsicmas.repository.ClassificationAuditRepository;
-import com.mx.microsicmas.repository.FindingRepository;
-import com.mx.microsicmas.repository.PlanningRepository;
-import com.mx.microsicmas.repository.PriorityRepository;
+import com.mx.microsicmas.repository.*;
 import com.mx.microsicmas.service.FindingService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +34,9 @@ public class FindingServiceImpl implements FindingService {
     @Autowired
     private ClassificationAuditRepository classificationAuditRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    @Autowired
+    private StatusRepository statusRepository;
+
     @Override
     public FindingResponse save(FindingRequest findingRequest) {
         Finding finding = new Finding();
@@ -59,15 +57,41 @@ public class FindingServiceImpl implements FindingService {
         if (findingRequest.getEndDate() != null) {
             finding.setEndDate(java.sql.Date.valueOf(LocalDate.parse(findingRequest.getEndDate(), formatter)));
         }
+        Long numFinding = findingRepository.getLastConsecutivo();
+        if(numFinding == null) {
+            numFinding = 1L;
+        }
+        if(findingRequest.getStatusEvent() != null) {
+            Status statusEvent = statusRepository.findStatusByIdAndEventTrueAndActiveTrue(findingRequest.getStatusEvent());
+            if(statusEvent == null) {
+                throw new EntityNotFoundException("status event not found");
+            }
+            finding.setStatusEvent(statusEvent);
+        }
+        if(findingRequest.getStatusApproval() != null) {
+            Status statusApproval = statusRepository.findStatusByIdAndApprovalTrueAndActiveTrue(findingRequest.getStatusApproval());
+            if(statusApproval == null) {
+                throw new EntityNotFoundException("status approval not found");
+            }
+            finding.setStatusApproval(statusApproval);
+        }
+        finding.setNumFinding("HZ-".concat(String.valueOf(numFinding)));
         finding.setUserReporter(getUsuarioHeaders());
         finding.setDateReported(new Date());
         ClassificationAudit classificationAudit =classificationAuditRepository.findById(findingRequest.getClasificationId())
                 .orElseThrow(()->new RuntimeException("No se encontró el classificationAudit"));
         finding.setClassification(classificationAudit);
         finding.setActive(true);
-        findingRepository.save(finding);
+        Finding findingSaved = findingRepository.save(finding);
         FindingResponse findingResponse = new FindingResponse();
         BeanUtils.copyProperties(findingRequest, findingResponse);
+        findingResponse.setId(findingSaved.getId());
+        findingResponse.setNumFinding(findingSaved.getNumFinding());
+        if(findingSaved.getPlanning() != null) {
+            findingResponse.setPlanningId(findingSaved.getPlanning().getId());
+        }
+        findingResponse.setPriorityId(findingSaved.getPriority().getId());
+        findingResponse.setClasificationId(findingSaved.getClassification().getId());
         return findingResponse;
 
     }
@@ -120,11 +144,77 @@ public class FindingServiceImpl implements FindingService {
             response.setClasificationId(finding.getClassification().getId());
             response.setClassificationName(finding.getClassification().getName());
         }
-        response.setStatusEvent(finding.getStatusEvent());
-        response.setStatusApproval(finding.getStatusApproval());
+        response.setStatusEvent(finding.getStatusEvent().getId());
+        response.setStatusApproval(finding.getStatusApproval().getId());
         response.setName(finding.getName());
         response.setDescription(finding.getDescription());
         response.setPointRule(finding.getPointRule());
         return response;
+    }
+    @Override
+    public Boolean delete(Long id) {
+        Finding findingDb = findingRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró el hallazgo con ID: " + id));
+        findingDb.setActive(false);
+        findingRepository.save(findingDb);
+        return true;
+    }
+
+    @Override
+    public FindingResponse update(FindingUpdateRequest findingRequest) {
+        Finding findingDb = findingRepository.findById(findingRequest.getId())
+                .orElseThrow(()-> new EntityNotFoundException("No se encontro Hallazgo con ID: " + findingRequest.getId()));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if (findingRequest.getPlanningId() != null) {
+            Planning planningdb =  planningRepository.findById(findingRequest.getPlanningId())
+                    .orElseThrow(() -> new EntityNotFoundException("Planning no encontrado con id: "+ findingRequest.getPlanningId()    ));
+            findingDb.setPlanning(planningdb);
+        }
+        if(findingRequest.getEndDate() != null) {
+            findingDb.setEndDate(java.sql.Date.valueOf(LocalDate.parse(findingRequest.getEndDate(), formatter)));
+        }
+        if(findingRequest.getDescription() != null) {
+            findingDb.setDescription(findingRequest.getDescription());
+        }
+        if(findingRequest.getName() != null) {
+            findingDb.setName(findingRequest.getName());
+        }
+        if (findingRequest.getPointRule() != null) {
+            findingDb.setPointRule(findingRequest.getPointRule());
+        }
+        if (findingRequest.getFindingDate() != null) {
+            findingDb.setEndDate(java.sql.Date.valueOf(LocalDate.parse(findingRequest.getFindingDate(), formatter)));
+        }
+        if (findingRequest.getPriorityId() != null) {
+             Priority prioritydb = priorityRepository.findById(findingRequest.getPriorityId())
+                     .orElseThrow(()-> new EntityNotFoundException("Prioridad no encontrado con id: "+ findingRequest.getPriorityId()));
+             findingDb.setPriority(prioritydb);
+        }
+        if(findingRequest.getClasificationId() != null) {
+            ClassificationAudit classificationAudit = classificationAuditRepository.findById(findingRequest.getClasificationId())
+                    .orElseThrow(()-> new EntityNotFoundException("Clasificacion no encontrado con id: "+ findingRequest.getClasificationId()));
+            findingDb.setClassification(classificationAudit);
+        }
+        if(findingRequest.getStatusEvent() != null) {
+            Status statusEvent = statusRepository.findStatusByIdAndEventTrueAndActiveTrue(findingRequest.getStatusEvent());
+            if(statusEvent == null) {
+                throw new EntityNotFoundException("status event not found");
+            }
+            findingDb.setStatusEvent(statusEvent);
+        }
+        if(findingRequest.getStatusApproval() != null) {
+            Status statusApproval = statusRepository.findStatusByIdAndApprovalTrueAndActiveTrue(findingRequest.getStatusApproval());
+            if(statusApproval == null) {
+                throw new EntityNotFoundException("status approval not found");
+            }
+            findingDb.setStatusApproval(statusApproval);
+        }
+        findingRepository.save(findingDb);
+        FindingResponse findingResponse = new FindingResponse();
+        BeanUtils.copyProperties(findingRequest, findingResponse);
+        findingResponse.setNumFinding(findingDb.getNumFinding());
+        findingResponse.setStatusApproval(findingDb.getStatusApproval().getId());
+        findingResponse.setStatusEvent(findingDb.getStatusEvent().getId());
+        return findingResponse;
     }
 }

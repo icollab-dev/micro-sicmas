@@ -1,17 +1,11 @@
 package com.mx.microsicmas.service.impl;
 
-import com.mx.microsicmas.domain.AuditoryEntity;
-import com.mx.microsicmas.domain.ClassificationAudit;
-import com.mx.microsicmas.domain.Rule;
-import com.mx.microsicmas.domain.Status;
+import com.mx.microsicmas.domain.*;
 import com.mx.microsicmas.model.response.AuditoryEntityResponse;
 import com.mx.microsicmas.model.response.CatalogResponse;
 import com.mx.microsicmas.model.response.RuleResponse;
 import com.mx.microsicmas.model.response.StatusResponse;
-import com.mx.microsicmas.repository.AuditoryEntityRepository;
-import com.mx.microsicmas.repository.ClassificationAuditRepository;
-import com.mx.microsicmas.repository.RuleRepository;
-import com.mx.microsicmas.repository.StatusRepository;
+import com.mx.microsicmas.repository.*;
 import com.mx.microsicmas.service.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,9 +24,16 @@ public class CatalogServiceImpl implements CatalogService {
     private AuditoryEntityRepository auditoryEntityRepository;
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private PriorityRepository priorityRepository;
     @Override
-    public List<CatalogResponse> getCatalogClasification() {
-        List<ClassificationAudit> cassification = classificationAuditRepository.findClassificationAuditsByActiveTrue();
+    public List<CatalogResponse> getCatalogClasification(String type) {
+        List<ClassificationAudit> cassification = null;
+        if(type.contains("find")){
+            cassification = classificationAuditRepository.findClassificationAuditsByActiveTrueAndFindTrue();
+        }else{
+            cassification = classificationAuditRepository.findClassificationAuditsByActiveTrueAndAuditoryTrue();
+        }
         List<CatalogResponse> catalogs = new ArrayList<CatalogResponse>();
         for (ClassificationAudit c : cassification) {
             CatalogResponse cat = new CatalogResponse();
@@ -79,6 +80,8 @@ public class CatalogServiceImpl implements CatalogService {
         List<Status> listStatus = new ArrayList<>();
         if (type.equals("auditory")) {
             listStatus = statusRepository.findStatusesByAuditoryTrueAndActiveTrue();
+        }else if(type.equals("event")){
+            listStatus = statusRepository.findStatusesByEventTrueAndActiveTrue();
         }else{
             listStatus = statusRepository.findStatusesByApprovalTrueAndActiveTrue();
         }
@@ -90,5 +93,18 @@ public class CatalogServiceImpl implements CatalogService {
             statusResponses.add(statusResponse);
         }
         return statusResponses;
+    }
+
+    @Override
+    public List<CatalogResponse> getCatalogPriority() {
+        List<Priority> prioritiesDb = priorityRepository.findPriorityByActiveTrue();
+        List<CatalogResponse> catalogs = new ArrayList<CatalogResponse>();
+      for (Priority p : prioritiesDb) {
+          CatalogResponse cat = new CatalogResponse();
+          cat.setId(p.getId());
+          cat.setName(p.getName());
+          catalogs.add(cat);
+      }
+        return catalogs;
     }
 }

@@ -11,4 +11,7 @@ import java.util.List;
 public interface StatusRepository extends JpaRepository<Status, Long> {
     List<Status> findStatusesByAuditoryTrueAndActiveTrue();
     List<Status> findStatusesByApprovalTrueAndActiveTrue();
+    List<Status> findStatusesByEventTrueAndActiveTrue();
+    Status findStatusByIdAndEventTrueAndActiveTrue(Long id);
+    Status findStatusByIdAndApprovalTrueAndActiveTrue(Long id);
 }

@@ -6,6 +6,7 @@ import com.mx.microsicmas.domain.FindingStaff;
 import com.mx.microsicmas.domain.Staff;
 import com.mx.microsicmas.model.request.FindingActionRequest;
 import com.mx.microsicmas.model.request.FindingRequest;
+import com.mx.microsicmas.model.request.FindingUpdateRequest;
 import com.mx.microsicmas.model.request.StaffFindingRequest;
 import com.mx.microsicmas.model.response.FindingActionResoponse;
 import com.mx.microsicmas.model.response.FindingResponse;
@@ -61,5 +62,13 @@ public class FindingController {
     @GetMapping("/action/list/{id}")
     public ResponseEntity<List<FindingActionResoponse>> listFindingAction(@PathVariable Long id){
         return ResponseEntity.ok(findigActionService.listByFinding(id));
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(findingService.delete(id));
+    }
+    @PutMapping()
+    public ResponseEntity<FindingResponse> update(@RequestBody @Validated FindingUpdateRequest findingRequest) {
+        return ResponseEntity.ok(findingService.update(findingRequest));
     }
 }

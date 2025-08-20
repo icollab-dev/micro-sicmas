@@ -20,9 +20,9 @@ public class CatalogController {
     @Autowired
     private CatalogService catalogService;
 
-    @GetMapping("/classifications")
-    public ResponseEntity<List<CatalogResponse>> listClassification() {
-        return ResponseEntity.ok(catalogService.getCatalogClasification());
+    @GetMapping("/classifications/{type}")
+    public ResponseEntity<List<CatalogResponse>> listClassification(@PathVariable String type) {
+        return ResponseEntity.ok(catalogService.getCatalogClasification(type));
     }
     @GetMapping("/rules")
     public ResponseEntity<List<RuleResponse>> listRule() {
@@ -39,6 +39,10 @@ public class CatalogController {
         }
         return ResponseEntity.ok(catalogService.getStatus(type));
 
+    }
+    @GetMapping("/priorities")
+    public ResponseEntity<List<CatalogResponse>> getCatalogPriorities() {
+        return ResponseEntity.ok(catalogService.getCatalogPriority());
     }
 
 }

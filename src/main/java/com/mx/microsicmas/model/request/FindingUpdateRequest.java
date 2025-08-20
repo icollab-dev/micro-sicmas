@@ -4,14 +4,15 @@ import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-public class FindingRequest {
+public class FindingUpdateRequest {
+    @NotNull
+    private Long id;
     private String numFinding;
     private Long planningId;
     @NotBlank
@@ -32,15 +33,4 @@ public class FindingRequest {
     private Long statusApproval;
     @NotNull
     private Long statusEvent;
-    /*
-    private String userReporter;
-    private String dateReported;
-    private String userSupervised;
-    private String dateSupervised;
-    private String userApproval;
-    private String dateApproved;
-    private String userReject;
-    private String dateRejected;
-
-    */
 }

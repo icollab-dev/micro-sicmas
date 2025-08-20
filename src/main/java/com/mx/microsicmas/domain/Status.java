@@ -25,10 +25,18 @@ public class Status extends BaseEntity {
     private Boolean auditory;
     @Column(name = "APPROVAL")
     private Boolean approval;
+    @Column(name = "EVENT")
+    private Boolean event;
 
     @OneToMany(mappedBy = "auditoryStatus", fetch = FetchType.LAZY)
     private List<Planning> planningsAsAuditoryStatus = new ArrayList<>();
 
     @OneToMany(mappedBy = "approvalStatus", fetch = FetchType.LAZY)
     private List<Planning> planningsAsApprovalStatus = new ArrayList<>();
+
+    @OneToMany(mappedBy = "statusApproval", fetch = FetchType.LAZY)
+    private List<Finding> findingsAsStatusApproval = new ArrayList<>();
+
+    @OneToMany(mappedBy = "statusEvent", fetch = FetchType.LAZY)
+    private List<Finding> findingsAsStatusEvent = new ArrayList<>();
 }
