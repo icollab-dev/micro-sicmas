@@ -39,4 +39,7 @@ public class Status extends BaseEntity {
 
     @OneToMany(mappedBy = "statusEvent", fetch = FetchType.LAZY)
     private List<Finding> findingsAsStatusEvent = new ArrayList<>();
+
+    @OneToMany(mappedBy = "statusId", fetch = FetchType.LAZY)
+    private List<FindingAction>  findingActionsAsStatusEvent = new ArrayList<>();
 }

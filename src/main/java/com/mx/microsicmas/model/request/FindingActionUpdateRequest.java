@@ -4,14 +4,15 @@ import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-public class FindingActionRequest {
+public class FindingActionUpdateRequest {
+    @NotNull
+    private Long id;
     @NotBlank
     private String name;
     @NotNull

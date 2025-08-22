@@ -11,9 +11,10 @@ import lombok.*;
 public class FindingActionResoponse {
     private Long id;
     private String name;
-    private String status;
+    private Long status;
     private String targetDate;
     private String endDate;
     private String responsable;
     private String observation;
+    private long findingId;
 }

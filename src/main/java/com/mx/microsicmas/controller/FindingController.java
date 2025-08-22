@@ -4,10 +4,7 @@ import com.mx.microsicmas.domain.Finding;
 import com.mx.microsicmas.domain.FindingAction;
 import com.mx.microsicmas.domain.FindingStaff;
 import com.mx.microsicmas.domain.Staff;
-import com.mx.microsicmas.model.request.FindingActionRequest;
-import com.mx.microsicmas.model.request.FindingRequest;
-import com.mx.microsicmas.model.request.FindingUpdateRequest;
-import com.mx.microsicmas.model.request.StaffFindingRequest;
+import com.mx.microsicmas.model.request.*;
 import com.mx.microsicmas.model.response.FindingActionResoponse;
 import com.mx.microsicmas.model.response.FindingResponse;
 import com.mx.microsicmas.model.response.FindingResponseOut;
@@ -38,37 +35,54 @@ public class FindingController {
     public ResponseEntity<FindingResponse> newFinding(@RequestBody @Validated FindingRequest finding) {
         return ResponseEntity.ok(findingService.save(finding));
     }
+
     @PostMapping("/list")
     public ResponseEntity<List<FindingResponseOut>> listFinding() {
         return ResponseEntity.ok(findingService.list());
     }
+
     @GetMapping("/list/{id}")
     public ResponseEntity<FindingResponseOut> listFinding(@PathVariable Long id) {
         return ResponseEntity.ok(findingService.findById(id));
     }
+
     @PostMapping("/staff/add")
     public ResponseEntity<StaffFindingResponse> addStaff(@RequestBody @Validated StaffFindingRequest staff) {
         return ResponseEntity.ok(findingStaffService.addStaffToFinding(staff));
     }
+
     @GetMapping("/list/staff/{id}")
     public ResponseEntity<List<StaffFindingResponse>> listFindingStaff(@PathVariable Long id) {
-        return  ResponseEntity.ok(findingStaffService.getStaffByFindingId(id));
+        return ResponseEntity.ok(findingStaffService.getStaffByFindingId(id));
     }
-    
+
     @PostMapping("/action/new")
-    public ResponseEntity<FindingActionResoponse> save(@RequestBody @Validated FindingActionRequest request){
+    public ResponseEntity<FindingActionResoponse> save(@RequestBody @Validated FindingActionRequest request) {
         return ResponseEntity.ok(findigActionService.save(request));
     }
+
     @GetMapping("/action/list/{id}")
-    public ResponseEntity<List<FindingActionResoponse>> listFindingAction(@PathVariable Long id){
+    public ResponseEntity<List<FindingActionResoponse>> listFindingAction(@PathVariable Long id) {
         return ResponseEntity.ok(findigActionService.listByFinding(id));
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
         return ResponseEntity.ok(findingService.delete(id));
     }
+
     @PutMapping()
     public ResponseEntity<FindingResponse> update(@RequestBody @Validated FindingUpdateRequest findingRequest) {
         return ResponseEntity.ok(findingService.update(findingRequest));
+    }
+
+    @PutMapping("/action")
+    public ResponseEntity<FindingActionResoponse> update(@RequestBody @Validated FindingActionUpdateRequest findingRequest) {
+        return ResponseEntity.ok(findigActionService.update(findingRequest));
+    }
+    
+    @DeleteMapping("/action/{id}")
+    public ResponseEntity<Boolean> deleteAction(@PathVariable Long id) {
+        return ResponseEntity.ok(findigActionService.delete(id));
     }
 }

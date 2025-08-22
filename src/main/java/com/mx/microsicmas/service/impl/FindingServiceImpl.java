@@ -183,7 +183,7 @@ public class FindingServiceImpl implements FindingService {
             findingDb.setPointRule(findingRequest.getPointRule());
         }
         if (findingRequest.getFindingDate() != null) {
-            findingDb.setEndDate(java.sql.Date.valueOf(LocalDate.parse(findingRequest.getFindingDate(), formatter)));
+            findingDb.setDate(java.sql.Date.valueOf(LocalDate.parse(findingRequest.getFindingDate(), formatter)));
         }
         if (findingRequest.getPriorityId() != null) {
              Priority prioritydb = priorityRepository.findById(findingRequest.getPriorityId())

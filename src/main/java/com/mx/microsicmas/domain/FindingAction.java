@@ -23,8 +23,9 @@ public class FindingAction extends BaseEntity {
     private Finding finding;
     @Column(name = "NAME")
     private String name;
-    @Column(name = "ESTATUS_ID")
-    private String statusId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ESTATUS_ID")
+    private Status statusId;
     @Column(name = "TARGET_DATE")
     private Date targetDate;
     @Column(name = "END_DATE")
