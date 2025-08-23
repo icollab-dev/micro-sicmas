@@ -36,7 +36,8 @@ public class SupportPlanningServiceImpl implements SupportPlanningService {
         SupportPlanning supportPlanning = new SupportPlanning();
         BeanUtils.copyProperties(dbFile, supportPlanning);
         supportPlanning.setActive(true);
-        Planning planning = planningRepository.findById(dbFile.getPlanningId()).orElseThrow(() -> new RuntimeException("Planning not found"));
+        Planning planning = planningRepository.findById(dbFile.getPlanningId())
+                .orElseThrow(() -> new RuntimeException("Planning not found"));
         supportPlanning.setPlanning(planning);
 
         return dbFileRepository.save(supportPlanning);

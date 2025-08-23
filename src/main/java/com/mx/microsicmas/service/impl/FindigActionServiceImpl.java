@@ -16,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -62,6 +63,7 @@ public class FindigActionServiceImpl implements FindigActionService {
 
     }
     public List<FindingActionResoponse> listByFinding(Long id) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         List<FindingAction> resposnes = findingActionRepository.findByFindingIdAndActiveTrue(id);
         return resposnes.stream().map(
                 rs->{
@@ -69,10 +71,13 @@ public class FindigActionServiceImpl implements FindigActionService {
                     findingActionResoponse.setId(rs.getId());
                     findingActionResoponse.setName(rs.getName());
                     findingActionResoponse.setStatus(rs.getStatusId().getId());
-                    findingActionResoponse.setTargetDate(rs.getTargetDate().toString());
-                    findingActionResoponse.setEndDate(rs.getEndDate().toString());
+                    Timestamp targetDate = (Timestamp) rs.getTargetDate();
+                    findingActionResoponse.setTargetDate(targetDate != null ? formatter.format(targetDate.toLocalDateTime().toLocalDate()) : null);
+                    Timestamp endDate = (Timestamp) rs.getEndDate();
+                    findingActionResoponse.setEndDate(endDate != null ? formatter.format(endDate.toLocalDateTime().toLocalDate()) : null);
                     findingActionResoponse.setResponsable(rs.getResponsable());
                     findingActionResoponse.setObservation(rs.getObservation());
+                    findingActionResoponse.setFindingId(rs.getFinding().getId());
                     return findingActionResoponse;
                 }
         ).collect(Collectors.toList());

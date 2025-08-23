@@ -1,6 +1,9 @@
 package com.mx.microsicmas.domain;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,5 +37,7 @@ public class FindingAction extends BaseEntity {
     private String responsable;
     @Column(name = "OBSERVATION")
     private String observation;
+    @OneToMany(mappedBy = "findingAction", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FindingActionFile> files = new ArrayList<>();
 
 }
